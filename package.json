@@ -1,0 +1,11 @@
+{
+  "name": "my-music",
+  "description": "音乐播放页面, 用于录制视频投b站",
+  "scripts": {
+    "dev": "yarn run start",
+    "start": "http-server ./src -o"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

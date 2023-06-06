@@ -1,0 +1,39 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/bin/yarn add http-server -D
+
+PATH: 
+  /Library/Frameworks/Python.framework/Versions/3.10/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/usr/local/mysql/bin:/usr/local/mysql/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  14.19.3
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: http://hnpm.hupu.io/http-server: ETIMEDOUT
+      at Timeout._onTimeout (/Users/zhuangjunlin/.config/yarn/global/node_modules/yarn/lib/cli.js:141550:19)
+      at listOnTimeout (internal/timers.js:557:17)
+      at processTimers (internal/timers.js:500:7)
+
+npm manifest: 
+  {
+    "name": "my-music",
+    "description": "音乐播放页面, 用于录制视频投b站",
+    "scripts": {
+      "dev": "yarn run start",
+      "start": "http-server ./src"
+    },
+    "devDependencies": {
+      
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
