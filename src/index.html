@@ -3708,6 +3708,13 @@
         }
         running = !running;
       });
+
+      // autoplay
+      const url = new URL(window.location.href);
+      console.log('autoplay: ', url.searchParams.get('autoplay') === '1');
+      if (url.searchParams.get('autoplay')) {
+        $('.m-song-wrap').click();
+      }
     });
 </script>
 </html>
