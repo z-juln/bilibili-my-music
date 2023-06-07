@@ -4,18 +4,20 @@ const ffmpegPath = require('ffmpeg-static');
 const fs = require('fs-extra');
 const ora = require('ora');
 
-const spin = ora({ color: 'yellow' }).start('生成中...');
+/** @typedef {{ webUrl: string; totalTime: number; interval?: number; output?: string; viewport?: { width: number; height: number; } }} Opts */
 
-const interval = 100;
-const totalTime = 0.1 * 60 * 1000;
-const url = 'http://127.0.0.1:8080?autoplay=1';
-const output = 'output.mp4';
-const viewport = {
-  width: 1280,
-  height: 720,
-};
+const screenRecord = async (/** @type {Opts} */ opts) => {
+  const {
+    webUrl,
+    interval = 1000 / 12, // 一秒12帧
+    totalTime,
+    output,
+    viewport = { width: 1280, height: 720 },
+  } = opts;
 
-(async () => {
+  const generateSpin = ora({ color: 'yellow', spinner: 'circle' }).start('生成中...');
+  const mergeSpin = ora({ color: 'yellow', spinner: 'circle' });
+
   fs.emptyDirSync('screenshot');
   fs.remove(output);
 
@@ -25,14 +27,14 @@ const viewport = {
     ignoreHTTPSErrors: true,
   });
   const page = await browser.newPage();
-  await page.goto(url);
+  await page.goto(webUrl);
   let i = 1;
   const doScreenshot = async () => {
-    spin.text = `生成中... ${(i / (totalTime / interval) * 100).toFixed(1)}%`;
-    const screenshot = await page.screenshot({ fullPage: true });
-    fs.writeFile(`screenshot/${i.toString().padStart(6, '0')}.png`, screenshot, { encoding: 'binary' }, (err) => {
+    generateSpin.text = `图片序列生成中... ${(i / (totalTime / interval) * 100).toFixed(1)}%`;
+    const screenshot = await page.screenshot({ fullPage: true, type: 'jpeg' });
+    fs.writeFile(`screenshot/${i.toString().padStart(6, '0')}.jpeg`, screenshot, { encoding: 'binary' }, (err) => {
       if (err) {
-        spin.fail('生成失败');
+        generateSpin.fail('图片序列生成失败');
         console.log('err', err);
       }
     });
@@ -45,11 +47,13 @@ const viewport = {
   setTimeout(() => {
     clearInterval(intervalTimer);
     setTimeout(() => {
+      generateSpin.succeed('图片序列生成完成');
+      mergeSpin.start('视频合成中...');
       // 延后3000ms执行，保证图片序列生成好了
       spawn(ffmpegPath, [
         '-f', 'image2',
         '-r', 1000 / interval, // 频率
-        '-i', 'screenshot/%06d.png',
+        '-i', 'screenshot/%06d.jpeg',
         '-c:v', 'libx264',
         '-crf', '18',
         '-preset', 'veryslow',
@@ -57,10 +61,22 @@ const viewport = {
         '-y', output,
       ])
         .on('close', async () => {
-          spin.succeed('生成完成');
+          mergeSpin.succeed('视频合成成功');
           await page.close();
           await browser.close();
+        })
+        .on('error', (error) => {
+          mergeSpin.fail('视频合成失败');
+          console.log('error', error);
         });
     }, 3000);
   }, totalTime);
-})();
+};
+
+screenRecord({
+  webUrl: 'http://127.0.0.1:8080?autoplay=1&speed=1',
+  interval: 1000 / 12,
+  totalTime: 1.2 * 60 * 1000,
+  output: 'output.mp4',
+  viewport: { width: 1024, height: 576 },
+});
