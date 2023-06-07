@@ -3618,11 +3618,13 @@
     </div>
   </div>
 
-
+  <audio id="audio"></audio>
 </body>
 <script>
   const $ = selector => document.querySelector(selector);
   const $$ = selector => Array.from(document.querySelectorAll(selector));
+
+  const audio = $('#audio');
 
   $('.m-song-wrap').addEventListener('click', () => {
     if ($('.m-song-plybtn').style.visibility === 'hidden') {
@@ -3645,6 +3647,7 @@
       const {
         name,
         cover,
+        audioSrc,
         createTime,
         publisher,
         lyric = [],
@@ -3655,7 +3658,8 @@
       $('.m-song-autr').textContent = author;
       $('.createTime').textContent = `创作时间: ${createTime}`;
       $('.m-song-friend .title-wrap .title').textContent = `bilibili up: ${author}`;
-      
+      audio.src = audioSrc;
+
       $('.m-song-iner').innerHTML = lyric.reduce((innerHTML, lyc) => {
         return innerHTML + `<p class="m-song-lritem">${lyc?.text}</p>`;
       }, '');
@@ -3692,8 +3696,10 @@
       lightCurrentLyc(0);
       $('.m-song-wrap').addEventListener('click', () => {
         if (running) {
+          audio.pause();
           clearInterval(timer);
         } else {
+          audio.play();
           timer = setInterval(() => {
             const currentLycIndex = findCurrentLycIndex(lyric);
             console.log('currentLycIndex', currentLycIndex);

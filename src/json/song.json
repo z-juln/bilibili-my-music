@@ -6,6 +6,7 @@
     "avatar": "/images/avatar.jpeg"
   },
   "cover": "/images/cover.jpeg",
+  "audio": "/audio/song.m4a",
   "lyric": [
     { "time": "00:00.000", "text": "作词: juln" },
     { "time": "00:02.000", "text": "作曲: juln" },
