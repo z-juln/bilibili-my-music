@@ -34,7 +34,9 @@ const screenRecord = async (/** @type {Opts} */ opts) => {
 
   const generateImages = () => new Promise((resolve, reject) => {
     let timer = null;
+    /** 当前图片序列 从1开始 */
     let i = 1;
+    /** 已生成的图片张数 */
     let imgCount = 0;
     const totalCount = Math.ceil(totalTime / interval);
     const doScreenshot = async () => {
