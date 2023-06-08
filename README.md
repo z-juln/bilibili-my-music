@@ -4,4 +4,4 @@
 
 # 其它录屏方式
 
-<https://codepen.io/kaikai1024/pen/wLWbpP>
+<https://zhuanlan.zhihu.com/p/71528138> <https://codepen.io/kaikai1024/pen/wLWbpP>
