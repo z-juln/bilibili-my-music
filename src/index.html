@@ -3624,6 +3624,13 @@
   const $ = selector => document.querySelector(selector);
   const $$ = selector => Array.from(document.querySelectorAll(selector));
 
+  const url = new URL(window.location.href);
+  const autoplay = url.searchParams.get('autoplay') === '1';
+  /** 播放倍速，便于快速录屏 */
+  const speed = +(url.searchParams.get('speed') || '1');
+  console.log('autoplay: ', autoplay);
+  console.log('speed: ', speed);
+
   const audio = $('#audio');
 
   $('.m-song-wrap').addEventListener('click', () => {
@@ -3650,8 +3657,17 @@
         audio: audioSrc,
         createTime,
         publisher,
-        lyric = [],
+        lyric: originalLyric = [],
       } = data;
+
+      const parseTime = (lycTime) => {
+        const [min, sec] = lycTime.split(':');
+        const timestamp = (min * 60 + sec) * 1000;
+        return timestamp;
+      };
+
+      const lyric = originalLyric.map(lyc => ({ text: lyc.text, time: parseTime(lyc.time) / speed }));
+
       const { name: author, avatar } = publisher ?? {};
       document.title = `${name} - ${author}`;
       $('.m-song-sname').textContent = name;
@@ -3665,15 +3681,11 @@
       }, '');
       
       let startTime = window.performance.now();
-      const parseTime = (lycTime) => {
-        const [min, sec] = lycTime.split(':');
-        const timestamp = (min * 60 + sec) * 1000;
-        return timestamp;
-      };
       const findCurrentLycIndex = (lyric) => {
         const now = window.performance.now() - startTime;
-        const index = lyric.findIndex(lyc => parseTime(lyc.time) > now);
-        if (index > 0 && index < lyric.length - 1) {
+        const index = lyric.findIndex(lyc => lyc.time > now);
+        if (index === 0) return 0;
+        if (index < lyric.length - 1) {
           return index - 1;
         }
         return lyric.length - 1;
@@ -3710,9 +3722,7 @@
       });
 
       // autoplay
-      const url = new URL(window.location.href);
-      console.log('autoplay: ', url.searchParams.get('autoplay') === '1');
-      if (url.searchParams.get('autoplay')) {
+      if (autoplay) {
         $('.m-song-wrap').click();
       }
     });
