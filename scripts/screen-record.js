@@ -4,16 +4,17 @@ const ffmpegPath = require('ffmpeg-static');
 const fs = require('fs-extra');
 const ora = require('ora');
 
-/** @typedef {{ webUrl: string; totalTime: number; interval?: number; output?: string; viewport?: { width: number; height: number; } }} Opts */
+/** @typedef {{ totalTime: number; fps?: number; output?: string; viewport?: { width: number; height: number; } }} Opts */
 
 const screenRecord = async (/** @type {Opts} */ opts) => {
   const {
-    webUrl,
-    interval = 1000 / 12, // 一秒12帧
+    fps = 12, // 一秒12帧
     totalTime,
     output,
     viewport = { width: 1280, height: 720 },
   } = opts;
+
+  const interval = 1000 / fps;
 
   const generateSpin = ora({ color: 'yellow', spinner: 'circle' }).start('生成中...');
   const mergeSpin = ora({ color: 'yellow', spinner: 'circle' });
@@ -27,7 +28,7 @@ const screenRecord = async (/** @type {Opts} */ opts) => {
     ignoreHTTPSErrors: true,
   });
   const page = await browser.newPage();
-  await page.goto(webUrl);
+  await page.goto('http://127.0.0.1:8080?autoplay=1&speed=1');
   let i = 1;
   const doScreenshot = async () => {
     generateSpin.text = `图片序列生成中... ${(i / (totalTime / interval) * 100).toFixed(1)}%`;
@@ -74,8 +75,7 @@ const screenRecord = async (/** @type {Opts} */ opts) => {
 };
 
 screenRecord({
-  webUrl: 'http://127.0.0.1:8080?autoplay=1&speed=1',
-  interval: 1000 / 12,
+  fps: 12,
   totalTime: 1.2 * 60 * 1000,
   output: 'output.mp4',
   viewport: { width: 1024, height: 576 },
