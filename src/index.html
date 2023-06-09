@@ -3534,11 +3534,10 @@
               </div>
               <div style="position: relative;">
                 <div class="button f-fcc f-bd ">
-                  <p class="txt createTime">2023-06-06 20:15</p><img class="icn"
+                  <p class="txt createTime">2023-06-06 20:15</p>
+                  <img class="icn"
                     src="data:image/svg+xml;base64,PHN2ZyBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxOCAzMiIgdmlld0JveD0iMCAwIDE4IDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xNjYuNzc3IDU3LjkzOWMtLjU4Ni41ODYtLjU4NiAxLjUzNiAwIDIuMTIxLjU4Ni41ODYgMS41MzYuNTg2IDIuMTIxIDBsMTQtMTRjLjU4Ni0uNTg2LjU4Ni0xLjUzNiAwLTIuMTIxbC0xNC0xNGMtLjU4Ni0uNTg2LTEuNTM2LS41ODYtMi4xMjEgMC0uNTg2LjU4Ni0uNTg2IDEuNTM2IDAgMi4xMjFsMTIuOTQgMTIuOTR6IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuOCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTE2NiAtMjkpIi8+PC9zdmc+"
-                    style="
-  display: none;
-">
+                    style="display: none;">
                 </div>
               </div>
             </div>
@@ -3572,17 +3571,17 @@
                           <div class="m-song-lrc f-pr">
                             <div class="m-song-scroll" style="/* height: 50px; */">
                               <div class="m-song-iner" style="transform: translateY(-0px);">
-                                <p class="m-song-lritem j-lritem" style="">作词 : juln</p>
-                                <p class="m-song-lritem j-lritem" style="">作曲 : juln</p>
-                                <p class="m-song-lritem j-lritem" style="">寂寞的天，寂寞的夜。寂寞得让自己寂寞</p>
-                                <p class="m-song-lritem j-lritem" style="">寂寞梧桐树下还开着寂寞</p>
-                                <p class="m-song-lritem j-lritem" style="">寂寞的人，寂寞的黑，寂寞的夜太过寂寞</p>
-                                <p class="m-song-lritem j-lritem" style="">寂寞得让自己不懂什么寂寞</p>
-                                <p class="m-song-lritem j-lritem" style=""></p>
-                                <p class="m-song-lritem j-lritem" style="">我总在大雨中，逼着自己去哭着</p>
-                                <p class="m-song-lritem j-lritem" style="">哭着那些所有不算寂寞</p>
-                                <p class="m-song-lritem j-lritem" style="">我总在黑夜中，其实自己很快活</p>
-                                <p class="m-song-lritem j-lritem" style="">快活得总是觉得自己很寂寞</p>
+                                <p class="m-song-lritem j-lritem">作词 : juln</p>
+                                <p class="m-song-lritem j-lritem">作曲 : juln</p>
+                                <p class="m-song-lritem j-lritem">寂寞的天，寂寞的夜。寂寞得让自己寂寞</p>
+                                <p class="m-song-lritem j-lritem">寂寞梧桐树下还开着寂寞</p>
+                                <p class="m-song-lritem j-lritem">寂寞的人，寂寞的黑，寂寞的夜太过寂寞</p>
+                                <p class="m-song-lritem j-lritem">寂寞得让自己不懂什么寂寞</p>
+                                <p class="m-song-lritem j-lritem"></p>
+                                <p class="m-song-lritem j-lritem">我总在大雨中，逼着自己去哭着</p>
+                                <p class="m-song-lritem j-lritem">哭着那些所有不算寂寞</p>
+                                <p class="m-song-lritem j-lritem">我总在黑夜中，其实自己很快活</p>
+                                <p class="m-song-lritem j-lritem">快活得总是觉得自己很寂寞</p>
                               </div>
                             </div>
                           </div>
@@ -3630,6 +3629,10 @@
   const speed = +(url.searchParams.get('speed') || '1');
   console.log('autoplay: ', autoplay);
   console.log('speed: ', speed);
+
+  $$('.a-circling').forEach(el => {
+    el.style = `-webkit-animation: circling ${20 / speed}s linear infinite;animation: circling ${20 / speed} linear infinite;`;
+  });
 
   const audio = $('#audio');
 
