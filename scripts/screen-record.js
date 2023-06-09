@@ -6,17 +6,36 @@ const ora = require('ora');
 
 const sleep = (timestamp) => new Promise(resolve => setTimeout(resolve, timestamp));
 
+const getLimitInterval = ({ originalFps, originalTotalTime }) => {
+  // const maxFps = 60;
+  const maxFps = originalFps * 2;
+  // 00:06 100 寂寞的天
+  // 00:14 200 寂寞梧桐
+  // 00:20 300 寂寞的人
+
+  const speed = maxFps / originalFps;
+
+  return {
+    interval: 1000 / maxFps,
+    speed,
+    fps: maxFps,
+    totalTime: originalTotalTime / speed,
+  };
+};
+
 /** @typedef {{ totalTime: number; fps?: number; output?: string; viewport?: { width: number; height: number; } }} Opts */
 
 const screenRecord = async (/** @type {Opts} */ opts) => {
   const {
-    fps = 12, // 一秒12帧
-    totalTime,
+    fps: originalFps = 12, // 一秒12帧
+    totalTime: originalTotalTime,
     output,
     viewport = { width: 1280, height: 720 },
   } = opts;
 
-  const interval = 1000 / fps;
+  const { fps, interval, totalTime, speed } = getLimitInterval({ originalFps, originalTotalTime });
+  const totalCount = Math.ceil(totalTime / interval);
+  console.log({ fps, interval, totalTime, totalCount, speed });
 
   const generateSpin = ora({ color: 'yellow', spinner: 'circle' }).start('生成中...');
   const mergeSpin = ora({ color: 'yellow', spinner: 'circle' });
@@ -30,7 +49,7 @@ const screenRecord = async (/** @type {Opts} */ opts) => {
     ignoreHTTPSErrors: true,
   });
   const page = await browser.newPage();
-  await page.goto('http://127.0.0.1:8080?autoplay=1&speed=1');
+  await page.goto(`http://127.0.0.1:8080?autoplay=1&speed=${speed}`);
 
   const generateImages = () => new Promise((resolve, reject) => {
     let timer = null;
@@ -38,15 +57,19 @@ const screenRecord = async (/** @type {Opts} */ opts) => {
     let i = 1;
     /** 已生成的图片张数 */
     let imgCount = 0;
-    const totalCount = Math.ceil(totalTime / interval);
     const doScreenshot = async () => {
       if (i === totalCount) {
         clearInterval(timer);
       }
+      if (i > totalCount) return;
 
       generateSpin.text = `图片序列生成中... ${(i / totalCount * 100).toFixed(1)}%`;
+      const filename = `${i.toString().padStart(6, '0')}.jpeg`;
+
+      i++;
+
       const screenshot = await page.screenshot({ fullPage: true, type: 'jpeg' });
-      fs.writeFile(`screenshot/${i.toString().padStart(6, '0')}.jpeg`, screenshot, { encoding: 'binary' }, (err) => {
+      fs.writeFile(`screenshot/${filename}`, screenshot, { encoding: 'binary' }, (err) => {
         imgCount++;
         if (err) {
           generateSpin.fail('图片序列生成失败');
@@ -59,7 +82,6 @@ const screenRecord = async (/** @type {Opts} */ opts) => {
           resolve();
         }
       });
-      i++;
     };
     doScreenshot();
     timer = setInterval(doScreenshot, interval);
@@ -71,7 +93,7 @@ const screenRecord = async (/** @type {Opts} */ opts) => {
     mergeSpin.start('视频合成中...');
     spawn(ffmpegPath, [
       '-f', 'image2',
-      '-r', 1000 / interval, // 频率
+      '-r', originalFps, // 频率
       '-i', 'screenshot/%06d.jpeg',
       '-c:v', 'libx264',
       '-crf', '18',
